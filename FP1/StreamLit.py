@@ -12,24 +12,33 @@ def load_data():
 def get_prediction(stock):
 #   Stock_predict.write("Fetching the prediction for ", Stock)
     stock_predict_data = load_data()
-    pred_result = stock_predict_data['result']
-    result=[]
+#   fetching the records for the particular stock
+    pred_data = stock_predict_data[stock_predict_data['symbol']==stock]
+    pred_result = stock_predict_data['result']   # Getting the predicted result to cumulate
+    result=0
     for p in pred_result:
         if p == 1:
-            result.append("Up")
+            result = result + 1
         else:
-            result.append("Down")
-    stock_predict_data['Result'] = result
-    pred_data = stock_predict_data[stock_predict_data['symbol']==stock]
-    pred_data_df = pred_data.get(['symbol', 'description', 'date', 'source.name'])
-    pred_data_df.columns = ['Stock Name','News Headline','Date','Source']
+            result = result - 1
+    if result > 0:
+        result = 'Up'
+    elif result == 0:
+        result = 'Neutral'
+    else:
+        result = 'Down'
+
+    pred_data = pred_data.get(['symbol', 'description', 'date', 'source.name'])
+    pred_data.columns = ['Stock Name','News Headline','Date','Source']
 
 ## Container for Stock prediction  
+    Stock_predict = st.container()
     Stock_predict.subheader("Prediction for Stock:")
-    write = "The Stock will go " + pred_data['Result']
-    Stock_predict.write(write)
+    msg = "The Stock will go " + result
+    Stock_predict.markdown(msg)
+    Stock_news = st.container()
     Stock_news.subheader('Prediction is based on the following News headlines:')
-    Stock_news.dataframe(pred_data_df)
+    Stock_news.dataframe(pred_data)
 
     
 ## Sidebar with Team info
@@ -55,8 +64,8 @@ Stock = Stock_input.selectbox("Please choose a stock: ",
                               stocks_list, index=None,
                               placeholder="Select a stock...")
 #Stock_input.write("Selected stock is ", Stock)
-Stock_predict = st.empty()
-Stock_news = st.empty()
+#Stock_predict = st.empty()
+#Stock_news = st.empty()
 # Button to get prediction from file
 if Stock_input.button("Get Prediction"):
     get_prediction(Stock)
