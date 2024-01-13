@@ -13,8 +13,8 @@ def get_prediction(stock):
 #   Stock_predict.write("Fetching the prediction for ", Stock)
     stock_predict_data = load_data()
 #   fetching the records for the particular stock
-    pred_data = stock_predict_data[stock_predict_data['symbol']==stock]
-    pred_result = stock_predict_data['result']   # Getting the predicted result to cumulate
+    pred_data = stock_predict_data[stock_predict_data['symbol']==stock].reset_index()
+    pred_result = pred_data['predictions']   # Getting the predicted result to cumulate
     result=0
     for p in pred_result:
         if p == 1:
